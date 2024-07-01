@@ -74,6 +74,12 @@
             font-size: 18px;
         }
 
+        .compliment {
+            margin-top: 10px;
+            font-size: 16px;
+            font-style: italic;
+        }
+
         .popup {
             position: fixed;
             top: 0;
@@ -85,6 +91,7 @@
             align-items: center;
             justify-content: center;
             color: white;
+            z-index: 1000; /* Assure le popup est au premier plan */
         }
 
         .popup-content {
@@ -103,6 +110,24 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
+        /* Animation pour les symboles */
+        @keyframes spin {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-300%); }
+        }
+
+        @keyframes glow {
+            0% { text-shadow: 0 0 5px #ff577f; }
+            50% { text-shadow: 0 0 20px #ff577f; }
+            100% { text-shadow: 0 0 5px #ff577f; }
+        }
+
+        /* Animation pour le bouton */
+        .button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(255, 87, 127, 0.7);
+        }
     </style>
 </head>
 
@@ -116,13 +141,15 @@
     <button class="button" id="spinButton">Lancer la Roue</button>
     <div class="tokens">Jetons : <span id="tokens">20</span></div>
     <div class="words">Mots Collectionnés : <span id="words"></span></div>
+    <div class="compliment" id="compliment"></div>
 
     <div class="popup" id="popup">
         <div class="popup-content">
             <h2>Règles du Jeu</h2>
             <p>Bienvenue sur la Roue des Mots Rigolos !</p>
             <p>Tu commences avec 20 jetons. Chaque lancer coûte 1 jeton.</p>
-            <p>Si trois cadeaux s'alignent, tu as un mot rigolo.</p>
+            <p>Si trois cadeaux s'alignent, tu obtiens un mot rigolo.</p>
+            <p></p>
             <button onclick="closePopup()">Jouer</button>
         </div>
     </div>
@@ -133,9 +160,21 @@
             { name: 'nounours', img: '🦐' },
             { name: 'cadeau', img: '🎁' },
             { name: 'cadeau', img: '🎁' },
-            { name: 'cadeau', img: '🎁' } // Ajoute plus de cadeaux pour augmenter la probabilité
+            { name: 'cadeau', img: '🎁' },
+            { name: 'cadeau', img: '🎁' },
+            { name: 'crevette', img: '🦐' },
+            { name: 'crevette', img: '🦐' },
+            { name: 'crevette', img: '🦐' }
         ];
+
         const words = [" Hurluberlu ", " Zigomar ", " Froufrou ", " Farfelu ", " Loufoque ", " Rigolo ", " Abracadabra ", " Croquignolet ", " Saperlipopette ", " Chamallow ", " Abracadabrant ", " Barbapapa ", " Cacahuète ", " Dinguerie ", " Ébouriffant ", " Farfeluchon ", " Gribouillis ", " Haricocotte ", " Incongru ", " Jabberwocky ", " Kaput ", " Loufoquerie ", " Marmelade ", " Nougatine ", " Oulala ", " Pataquès ", " Quenotte ", " Roudoudou ", " Saperlotte ", " Turlututu ", " Vrilles ", " Wapiti ", " Xylophone ", " Youkoulele ", " Zébulon ", " Amusette ", " Babiole ", " Cacophonie ", " Dérision ", " Éclectique ", " Farandole ", " Galipette ", " Hilarant ", " Imbécile ", " Jacasser ", " Kif-kif ", " Lampion ", " Malabar ", " Niaiseries "];
+        const compliments = [
+            "Pour ton moral : Tu es incroyablement brillant(e) !",
+            "Pour ton moral : Tu as un sourire magnifique !",
+            "Pour ton moral : Ta gentillesse illumine la journée !",
+            "Pour ton moral : Ton travail est vraiment exceptionnel !",
+            "Pour ton moral : Tu es une source d'inspiration pour tous !"
+        ];
         let collectedWords = [];
         let tokens = 20;
         let spinning = false;
@@ -179,15 +218,16 @@
         }
 
         function checkResults(results) {
-            if (results.every(result => result === 'cadeau')) {
-                if (Math.random() < 1) {
-                    const newWord = words[Math.floor(Math.random() * words.length)];
-                    if (!collectedWords.includes(newWord)) {
-                        collectedWords.push(newWord);
-                        document.getElementById("words").innerText = collectedWords.join(", ");
-                    }
-                    alert(`Félicitations ! Vous avez trouvé le mot : ${newWord}`);
-                }
+            const uniqueResults = [...new Set(results)]; // Retirer les résultats en doublon
+
+            if (uniqueResults.length === 1 && uniqueResults[0] === 'cadeau') {
+                const newWord = words[Math.floor(Math.random() * words.length)];
+                collectedWords.push(newWord);
+                document.getElementById("words").innerText = collectedWords.join(", ");
+                alert(`Félicitations ! Vous avez trouvé le mot rigolo : ${newWord}`);
+            } else if (uniqueResults.length === 1 && uniqueResults[0] === 'crevette') {
+                const compliment = compliments[Math.floor(Math.random() * compliments.length)];
+                document.getElementById("compliment").innerText = compliment;
             }
             spinning = false;
         }
@@ -200,3 +240,4 @@
 </body>
 
 </html>
+
